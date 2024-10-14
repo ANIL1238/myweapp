@@ -2,43 +2,44 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_CREDENTIALS = credentials('docker-hub-credentials') // Assuming you saved your Docker Hub credentials in Jenkins
+        DOCKER_CREDENTIALS_ID = 'docker-credentials' // Replace with your Jenkins Docker credentials ID
+        DOCKER_IMAGE_NAME = 'anil3812/<your-image-name>' // Change <your-image-name> to your preferred image name
+        GITHUB_REPO = 'https://github.com/ANIL1238/myweapp.git'
+        GITHUB_BRANCH = 'main' // Change if your branch name is different
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('Checkout') {
             steps {
-                // Clone the GitHub repository containing your Dockerfile and HTML files
-                git branch: 'main', url: 'https://github.com/ANIL1238/myweapp.git'
+                git branch: "${GITHUB_BRANCH}", url: "${GITHUB_REPO}"
             }
         }
+
         stage('Build Docker Image') {
             steps {
                 script {
                     // Build the Docker image
-                    def imageName = "anil3812/myweapp" // Change this to your Docker Hub image name
-                    def tag = "latest" // Change this to your desired tag
-
-                    sh "docker build -t ${imageName}:${tag} ."
+                    sh 'docker build -t ${DOCKER_IMAGE_NAME} .'
                 }
             }
         }
+
         stage('Login to Docker Hub') {
             steps {
                 script {
-                    // Login to Docker Hub
-                    sh "echo '${DOCKER_CREDENTIALS}' | docker login -u '${DOCKER_CREDENTIALS_USR}' --password-stdin"
+                    // Log in to Docker Hub
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDENTIALS_ID) {
+                        // The image will be pushed in the next stage
+                    }
                 }
             }
         }
+
         stage('Push Docker Image') {
             steps {
                 script {
                     // Push the Docker image to Docker Hub
-                    def imageName = "anil3812/myweapp" // Change this to your Docker Hub image name
-                    def tag = "latest" // Change this to your desired tag
-
-                    sh "docker push ${imageName}:${tag}"
+                    sh 'docker push ${DOCKER_IMAGE_NAME}'
                 }
             }
         }
@@ -46,11 +47,10 @@ pipeline {
 
     post {
         success {
-            echo 'Docker image has been successfully pushed to Docker Hub!'
+            echo 'Pipeline completed successfully!'
         }
         failure {
-            echo 'There was an issue with the pipeline.'
+            echo 'Pipeline failed.'
         }
     }
 }
-

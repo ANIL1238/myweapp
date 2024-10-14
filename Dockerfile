@@ -7,7 +7,7 @@ WORKDIR /app
 COPY  ./ ./  
 #copy files form the local machine 
 
-EXPOSE 80
+EXPOSE 7080
 
 
 

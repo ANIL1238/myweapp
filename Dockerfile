@@ -5,7 +5,7 @@ FROM nginx:latest
 WORKDIR /usr/share/nginx/html
 
 # Copy your HTML files into the container
-COPY /home/ec2-user/myweapp/ .
+COPY . .
 
 # Expose port 7080
 EXPOSE 7080

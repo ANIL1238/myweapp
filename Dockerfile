@@ -1,14 +1,14 @@
-#from
+# Use the official Nginx image as a base image
+FROM nginx:latest
 
-FROM nginx:alpine
+# Set the working directory inside the container
+WORKDIR /usr/share/nginx/html
 
-WORKDIR /app
+# Copy your HTML files into the container
+COPY /home/ec2-user/myweapp/ .
 
-COPY  ./ ./  
-#copy files form the local machine 
-
+# Expose port 7080
 EXPOSE 7080
 
-
-
-#CMD [ "executable" ]
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
